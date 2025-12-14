@@ -84,3 +84,45 @@ CREATE TABLE
         multiplier DECIMAL(5, 3) NOT NULL,
         created_at TIMESTAMP DEFAULT NOW ()
     );
+
+INSERT INTO
+    ans_age_brackets (bracket_code, age_min, age_max, multiplier)
+VALUES
+    ('00-18', 0, 18, 1.000),
+    ('19-23', 19, 23, 1.000),
+    ('24-28', 24, 28, 1.389),
+    ('29-33', 29, 33, 1.565),
+    ('34-38', 34, 38, 1.980),
+    ('39-43', 39, 43, 2.227),
+    ('44-48', 44, 48, 2.847),
+    ('49-53', 49, 53, 3.408),
+    ('54-58', 54, 58, 4.126),
+    ('59+', 59, NULL, 6.000) ON CONFLICT DO NOTHING;
+
+CREATE TABLE
+    IF NOT EXISTS pricing_events (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4 (),
+        event_type VARCHAR(100) NOT NULL,
+        entity_type VARCHAR(50) NOT NULL,
+        entity_id UUID,
+        payload JSONB NOT NULL DEFAULT '{}',
+        performed_by VARCHAR(100),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW ()
+    );
+
+CREATE INDEX IF NOT EXISTS pricing_events_entity_idx ON pricing_events (entity_type, entity_id, created_at);
+
+CREATE TABLE
+    IF NOT EXISTS quotations (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4 (),
+        quotation_code VARCHAR(30) UNIQUE NOT NULL,
+        product_code VARCHAR(20) NOT NULL REFERENCES products (code),
+        customer_data JSONB NOT NULL,
+        input_params JSONB NOT NULL,
+        breakdown JSONB NOT NULL,
+        base_premium DECIMAL(12, 2) NOT NULL,
+        final_premium DECIMAL(12, 2) NOT NULL,
+        status VARCHAR(20) DEFAULT 'ACTIVE',
+        valid_until DATE,
+        created_at TIMESTAMP DEFAULT NOW ()
+    );
