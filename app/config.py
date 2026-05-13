@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
+
 
 class Settings:
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
@@ -12,5 +14,6 @@ class Settings:
     CACHE_TTL: int = int(os.getenv("CACHE_TTL_SECONDS", "3600"))
     QUOTATION_VALIDITY_DAYS: int = 30
     MAX_SIMULATION_SCENARIOS: int = 5
+
 
 settings = Settings()
